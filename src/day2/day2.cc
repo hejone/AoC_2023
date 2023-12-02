@@ -2,12 +2,12 @@
 #include <vector>
 #include <string>
 #include <fstream>
-#include <regex>
-#include <tuple>
+#include <array>
 #include <map>
 #include <iostream>
+#include <numeric>
 
-typedef std::tuple<int, int, int> RGBTuple;
+typedef std::array<int, 3> RGBTuple;
 
 std::pair<int, std::vector<RGBTuple>> splitLine(const std::string& line) {
     auto pos = line.find_first_of(':');
@@ -41,13 +41,13 @@ std::pair<int, std::vector<RGBTuple>> splitLine(const std::string& line) {
             ++i; // Go over the space between the number and colour
             switch (rgbString[i]) {
             case 'r':
-                std::get<0>(trio) = num;
+                trio[0] = num;
                 break;
             case 'g':
-                std::get<1>(trio) = num;
+                trio[1] = num;
                 break;
             case 'b':
-                std::get<2>(trio) = num;
+                trio[2] = num;
                 break;
             default:
                 break;
@@ -77,9 +77,7 @@ int calcSucceededSum(const std::map<int, std::vector<RGBTuple>>& rgbMapping,
     for (const auto& [game_num, rgbs] : rgbMapping) {
         bool succeeded = true;
         for (const auto& rgb : rgbs) {
-            if (std::get<0>(rgb) > redLimit ||
-                    std::get<1>(rgb) > greenLimit ||
-                    std::get<2>(rgb) > blueLimit) {
+            if (rgb[0] > redLimit || rgb[1] > greenLimit || rgb[2] > blueLimit) {
                 succeeded = false;
                 break;
             }
@@ -96,11 +94,11 @@ int calcMinimumPossiblePowersSum(const std::map<int, std::vector<RGBTuple>>& rgb
     for (const auto& [game_num, rgbs] : rgbMapping) {
         RGBTuple minimums = {-1, -1, -1};
         for (const auto& rgb : rgbs) {
-            std::get<0>(minimums) = std::max(std::get<0>(minimums), std::get<0>(rgb));
-            std::get<1>(minimums) = std::max(std::get<1>(minimums), std::get<1>(rgb));
-            std::get<2>(minimums) = std::max(std::get<2>(minimums), std::get<2>(rgb));
+            for (size_t i = 0; i < 3; ++i) {
+                minimums[i] = std::max(minimums[i], rgb[i]);
+            }
         }
-        total_sum += std::get<0>(minimums) * std::get<1>(minimums) * std::get<2>(minimums);
+        total_sum += std::accumulate(minimums.begin(), minimums.end(), 1, std::multiplies<int>());
     }
     return total_sum;
 }
