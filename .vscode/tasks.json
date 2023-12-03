@@ -7,7 +7,7 @@
             "args": [
                 "-fdiagnostics-color=always",
                 "-g",
-                "${file}",
+                "${fileDirname}/*.cc",
                 "-o",
                 "${fileDirname}/${fileBasenameNoExtension}.out"
             ],
