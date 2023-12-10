@@ -6,8 +6,9 @@ int main() {
     auto read_file = util::readFile("input.txt");
     auto oasis_analyzer = OasisReportAnalyzer();
     oasis_analyzer.read_report(read_file);
-    auto result1 = oasis_analyzer.calculate_predictions_sum();
+    auto results = oasis_analyzer.calculate_predictions_sum();
 
-    std::cout << "Part 1 result: " << result1 << "\n";
+    std::cout << "Part 1 result: " << results.second << "\n";
+    std::cout << "Part 2 result: " << results.first << "\n";
     return EXIT_SUCCESS;
 }

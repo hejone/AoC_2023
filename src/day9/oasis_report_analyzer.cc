@@ -6,7 +6,7 @@ Report::Report(const std::vector<int64_t>& report)
         original = std::deque<int64_t> {report.begin(), report.end()};
     }
 
-int64_t Report::calculate_prediction() {
+std::pair<int64_t, int64_t> Report::calculate_predictions() {
     auto rows = std::deque<std::deque<int64_t>>();
     auto current_row = original;
     rows.push_back(original);
@@ -26,9 +26,11 @@ int64_t Report::calculate_prediction() {
     }
     for (size_t i = rows.size() - 1; i > 0; --i) {
         auto next = rows.at(i).back() + rows.at(i - 1).back();
+        auto prev = rows.at(i - 1).front() - rows.at(i).front();
         rows.at(i - 1).push_back(next);
+        rows.at(i - 1).push_front(prev);
     }
-    return rows.at(0).back();
+    return {rows.at(0).front(), rows.at(0).back()};
 }
 
 void OasisReportAnalyzer::read_report(const std::vector<std::string>& lines) {
@@ -38,11 +40,13 @@ void OasisReportAnalyzer::read_report(const std::vector<std::string>& lines) {
     }
 }
 
-int64_t OasisReportAnalyzer::calculate_predictions_sum()
+std::pair<int64_t, int64_t> OasisReportAnalyzer::calculate_predictions_sum()
 {
-    int64_t sum = 0;
+    std::pair<int64_t, ino64_t> sums = {0, 0};
     for (const auto& report : _reports) {
-        sum += report->calculate_prediction();
+        auto new_vals = report->calculate_predictions();
+        sums.first += new_vals.first;
+        sums.second += new_vals.second;
     }
-    return sum;
+    return sums;
 }
